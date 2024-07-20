@@ -26,9 +26,9 @@ namespace Presentation.Models.Client
         [StringLength(11, MinimumLength = 11, ErrorMessage = "Personal ID must be exactly 11 characters.")]
         public string PersonalId { get; set; }
 
-        [Required]
-        [Url]
-        public string ProfilePhotoUrl { get; set; }
+        //[Required]
+        //[Url]
+        //public string ProfilePhotoUrl { get; set; }
 
         [Required]
         [Phone]
@@ -40,9 +40,9 @@ namespace Presentation.Models.Client
         [Required]
         public AddressDTOForCreate Address { get; set; }
 
-        [Required]
-        [MinLength(1, ErrorMessage = "At least one account is required.")]
-        public List<AccountDTOForCreate> Accounts { get; set; }
+        //[Required]
+        //[MinLength(1, ErrorMessage = "At least one account is required.")]
+        //public List<AccountDTOForCreate> Accounts { get; set; }
     
 }
 }

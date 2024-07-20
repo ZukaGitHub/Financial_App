@@ -13,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using Presentation.AutoMapper;
 using Domain;
 using Persistance.UnitOfWork;
+using Infrastructure.ValidationService;
+using Infrastructure.FileManager;
 
 
 Assembly presentationAssembly = typeof(Presentation.AssemblyReference).Assembly;
@@ -32,6 +34,9 @@ builder.Services.AddDbContext<FinancialAppDBContext>(options =>
 });
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddHttpClient<ValidationService>();
+builder.Services.AddScoped<IFileManager>(provider =>
+    new FileManager(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads")));
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
@@ -115,7 +120,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -15,7 +15,10 @@ namespace Persistance.UnitOfWork
 
         private IClientRepository _clientRepository;
 
-
+        public UnitOfWork(FinancialAppDBContext context)
+        {
+            _context= context;
+        }
 
 
 

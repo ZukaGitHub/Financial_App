@@ -11,6 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Application.Client.CreateClient;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Infrastructure.ValidationService;
+using Infrastructure.FileManager;
+using Microsoft.AspNetCore.Http;
 
 namespace Presentation.Controllers
 {
@@ -20,11 +23,14 @@ namespace Presentation.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-       
-        public ClientController(IMediator mediator, IMapper mapper, ITokenService tokenService)
+        private readonly ValidationService _validationService;
+        private readonly IFileManager _FileManager;
+        public ClientController(IMediator mediator, IMapper mapper, ITokenService tokenService,ValidationService validationService,IFileManager fileManager)
         {
             _mediator = mediator;
-            _mapper = mapper;           
+            _mapper = mapper;       
+            _validationService = validationService;
+            _FileManager = fileManager;
         }
 
         //[HttpGet]
@@ -38,7 +44,7 @@ namespace Presentation.Controllers
 
         //}
         [HttpPost("Create")]
-        public async Task<IActionResult> CreateClient(CreateClientDTO model, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateClient([FromForm]CreateClientDTOWithRegionCode model, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -46,7 +52,32 @@ namespace Presentation.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var client = _mapper.Map<Client>(model);
+                //if (Image == null)
+                //{
+                //    return BadRequest("Image Cannot Be null");
+                //}
+                var AddressResult = await _validationService.IsValidCityAsync(model.CreateClientDTO.Address.City, model.CreateClientDTO.Address.Country);
+                if (!AddressResult)
+                {
+                    return BadRequest("invalid country or city,must input real country and city names");
+                }
+                var zipCodeResult = await _validationService.IsValidZipCodeAsync(model.CreateClientDTO.Address.ZipCode, model.CreateClientDTO.Address.City);
+                if (!zipCodeResult)
+                {
+                    return BadRequest("invalid zipcode for given city ,must input real zipcode and city");
+                }
+                var phoneNumberResult = _validationService.IsValidPhoneNumber(model.CreateClientDTO.MobileNumber, model.RegionCode);
+                if (!phoneNumberResult)
+                {
+                    return BadRequest("invalid phone number format");
+                }
+             
+                var client = _mapper.Map<Client>(model.CreateClientDTO);
+                var imageUrl = await _FileManager.SaveFileAsync(model.Image);
+                if (imageUrl != null)
+                {
+                    client.ProfilePhotoUrl = imageUrl;
+                }
                 var command = new CreateClientCommand() { Client = client };
                 var result = await _mediator.Send(command, cancellationToken);
                 if (result.Errors == null)

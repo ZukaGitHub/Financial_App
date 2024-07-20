@@ -15,12 +15,12 @@ namespace Presentation.AutoMapper
         public AutoMapperProfiler()
         {
             CreateMap<Client, CreateClientDTO>()
-              .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-              .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.Accounts));
+              .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+            /*  .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.Accounts))*/
 
             CreateMap<CreateClientDTO, Client>()
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.Accounts));
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+                //.ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.Accounts));
 
 
             CreateMap<Address, AddressDTOForCreate>()

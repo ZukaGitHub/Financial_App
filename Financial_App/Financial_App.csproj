@@ -23,4 +23,7 @@
 		<ProjectReference Include="..\Persistance\Persistance.csproj" />
 		<ProjectReference Include="..\Presentation\Presentation.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="wwwroot\uploads\" />
+	</ItemGroup>
 </Project>
