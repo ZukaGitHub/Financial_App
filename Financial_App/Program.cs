@@ -6,17 +6,30 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Persistance;
+using static System.Net.Mime.MediaTypeNames;
+using System.Reflection;
+using Infrastructure.AutoMapper;
+using Infrastructure.JWT;
+using Microsoft.OpenApi.Models;
+
+
+Assembly presentationAssembly = typeof(Presentation.AssemblyReference).Assembly;
+Assembly applicationAssembly = typeof(Application.AssemblyReference).Assembly;
+Assembly domainAssembly = typeof(Domain.AssemblyReference).Assembly;
+Assembly infrastructureAssembly = typeof(Infrastructure.AssemblyReference).Assembly;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddDbContext<FinancialAppDBContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConntection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     options.Password.RequireDigit = false;
@@ -49,12 +62,48 @@ builder.Services.AddAuthentication(options =>
             )
     };
 });
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdminClaim", policy =>
+        policy.RequireClaim("AdminClaim", "true"));
 
+    options.AddPolicy("RequireUserClaim", policy =>
+        policy.RequireClaim("UserClaim", "true"));
+});
 
+builder.Services.AddMediatR(config => config.RegisterServicesFromAssembly(applicationAssembly));
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiler));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 
 var app = builder.Build();
 
