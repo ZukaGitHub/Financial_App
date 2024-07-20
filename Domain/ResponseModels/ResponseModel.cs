@@ -19,4 +19,8 @@ namespace Domain.SharedModels
     {
         public User User { get; set; }
     }
+    public class CreateClientResponseModel : ResponseModel
+    {
+        public bool IsCreated { get; set; }
+    }
 }

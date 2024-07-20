@@ -8,9 +8,11 @@ using Microsoft.IdentityModel.Tokens;
 using Persistance;
 using static System.Net.Mime.MediaTypeNames;
 using System.Reflection;
-using Infrastructure.AutoMapper;
 using Infrastructure.JWT;
 using Microsoft.OpenApi.Models;
+using Presentation.AutoMapper;
+using Domain;
+using Persistance.UnitOfWork;
 
 
 Assembly presentationAssembly = typeof(Presentation.AssemblyReference).Assembly;
@@ -28,7 +30,7 @@ builder.Services.AddDbContext<FinancialAppDBContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {

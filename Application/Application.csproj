@@ -15,5 +15,10 @@
 		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
 	
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Client\GetClientList\" />
+	  <Folder Include="Client\DeleteClient\" />
+	  <Folder Include="Client\UpdateClient\" />
+	</ItemGroup>
 
 </Project>
