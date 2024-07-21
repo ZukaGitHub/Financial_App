@@ -48,5 +48,6 @@ namespace Domain.SharedModels
         public List<Client> Clients { get; set; }
         public int? PageCount { get; set; }
         public int? PageNumber { get; set; }
+        public string SearchId { get; set; }
     }
 }

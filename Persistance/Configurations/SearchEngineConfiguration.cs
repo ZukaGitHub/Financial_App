@@ -18,7 +18,7 @@ namespace Persistance.Configurations
             builder.HasKey(c => c.Id);
             builder.Property(c => c.SearchField);
             builder.Property(c => c.UserId);
-            builder.Property(c => c.SearchDate);
+            builder.Property(c => c.SearchDate).HasColumnType(DBTypes.DateTime);
             builder.Property(c => c.SortOption);
             builder.Property(c => c.PageNumber);
             builder.Property(c => c.PageSize);

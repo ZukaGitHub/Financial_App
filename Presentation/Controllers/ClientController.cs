@@ -24,11 +24,13 @@ using Presentation.Models.SearchEngine;
 using Application.SearchEngine;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Application.Client.GetClientList;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Presentation.Controllers
 {
     [Route("Api/Client")]
     [ApiController]
+    [Authorize(Policy = "RequireAdminClaim")]
     public class ClientController:ControllerBase
     {
         private readonly IMediator _mediator;
@@ -62,7 +64,8 @@ namespace Presentation.Controllers
             }
 
         }
-        [HttpGet]
+        [HttpPost("GetListWithSearchEngine")]
+      
         public async Task<IActionResult> GetClientListWithSearchEngine(SearchEngineDTO model,CancellationToken cancellationToken)
         {
             try
@@ -75,25 +78,22 @@ namespace Presentation.Controllers
                    
                     searchEngine.PageNumber = 1;
                     searchEngine.PageSize = 9;
-                    searchEngine.SearchDate = DateTime.Now;
+                   
                 }
                 else
                 {
                     searchEngine = _mapper.Map<SearchEngine>(model);
-                    if (searchEngine.Id == null)
-                    {
-                        if (searchEngine.PageNumber == null)
+                   
+                        if (searchEngine.PageNumber == null|| searchEngine.PageNumber==0 || searchEngine.PageNumber <0)
                         {
                             searchEngine.PageNumber = 1;
                         }
-                        if (searchEngine.PageSize == null)
+                        if (searchEngine.PageSize == null || searchEngine.PageSize == 0 || searchEngine.PageSize < 0)
                         {
-                            searchEngine.PageNumber = 9;
-                        }
-                       
-                    }
-                    searchEngine.SearchDate = DateTime.Now;
+                            searchEngine.PageSize = 9;
+                        }                 
                 }
+                searchEngine.SearchDate = DateTime.Now;
                 var command=new GetClientListWithSearchEngineCommand() {SearchEngine=searchEngine};
                 var result = await _mediator.Send(command, cancellationToken);
                 if(result.Clients!=null && result.Clients.Count > 0)
@@ -112,6 +112,7 @@ namespace Presentation.Controllers
             }
         }
         [HttpPost("Create")]
+      
         public async Task<IActionResult> CreateClient([FromForm]CreateClientDTOWithRegionCode model, CancellationToken cancellationToken = default)
         {
             try
@@ -163,7 +164,8 @@ namespace Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut]
+        [HttpPut("Update")]
+   
         public async Task<IActionResult> UpdateClient([FromForm] UpdateClientWithImageAndRegionCode model,CancellationToken cancellationToken)
         {
            
@@ -241,6 +243,7 @@ namespace Presentation.Controllers
             }
         }
         [HttpDelete("Delete")]
+     
         public async Task<IActionResult> DeleteClient(int Id,CancellationToken cancellationToken)
         {
             try

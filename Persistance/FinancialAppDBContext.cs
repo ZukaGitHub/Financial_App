@@ -34,20 +34,20 @@ namespace Persistance
                     entityType.SetSchema(Schemas.Identity);
                 }
             }
-            List<IdentityRole> roles = new List<IdentityRole>()
-            {
-                new IdentityRole
-                {
-                    Name="Admin",
-                    NormalizedName="ADMIN"
-                },
-                new IdentityRole
-                {
-                    Name="User",
-                    NormalizedName="USER"
-                }
-            };
-            modelBuilder.Entity<IdentityRole>().HasData(roles);
+            //List<IdentityRole> roles = new List<IdentityRole>()
+            //{
+            //    new IdentityRole
+            //    {
+            //        Name="Admin",
+            //        NormalizedName="ADMIN"
+            //    },
+            //    new IdentityRole
+            //    {
+            //        Name="User",
+            //        NormalizedName="USER"
+            //    }
+            //};
+            //modelBuilder.Entity<IdentityRole>().HasData(roles);
         }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Client> Clients { get; set; }

@@ -12,6 +12,7 @@ namespace Application.SearchEngine
         public static bool HasAnySearchCriteria(SearchEngineDTO searchEngine)
         {
             return !string.IsNullOrEmpty(searchEngine.SearchField) ||
+                 
                    !string.IsNullOrEmpty(searchEngine.PersonalId) ||
                    searchEngine.SortOption != default ||
                    !string.IsNullOrEmpty(searchEngine.Id) ||

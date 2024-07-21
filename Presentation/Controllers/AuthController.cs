@@ -89,12 +89,5 @@ namespace Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-        [HttpPost()]
-        [Authorize(Policy ="RequireAdminClaim")]
-        public async Task<IActionResult> TestAuth()
-        {
-            return Ok("it was hit");
-        }
     }
 }

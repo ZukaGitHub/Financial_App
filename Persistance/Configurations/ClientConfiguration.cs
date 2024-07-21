@@ -57,7 +57,7 @@ namespace Persistance.Configurations
             builder.HasOne(c => c.Address)
                 .WithOne(a => a.Client)
                 .HasForeignKey<Address>(a => a.ClientId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(c => c.Accounts)
                 .WithOne(a => a.Client)

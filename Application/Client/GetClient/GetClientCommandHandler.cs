@@ -4,6 +4,7 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,8 +19,12 @@ namespace Application.Client.GetClient
         }
         public async Task<GetClientReponseModel> Handle(GetClientCommand command,CancellationToken cancellationToken=default)
         {
-          
-                var client = await _unitOfWork.ClientRepository.GetAsync(c => c.Id == command.Id);
+               var includeExpressions = new Expression<Func<Domain.Entities.Client, object>>[]
+                 {
+                      client => client.Accounts,
+                      client => client.Address
+                 };
+                var client = await _unitOfWork.ClientRepository.GetAsync(c => c.Id == command.Id,includeExpressions);
                 var responseModel = new GetClientReponseModel();
                 if(client == null)
                 {

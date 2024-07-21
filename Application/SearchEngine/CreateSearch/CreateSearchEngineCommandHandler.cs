@@ -18,8 +18,7 @@ namespace Application.SearchEngine.CreateSearch
         }
         public async Task<SearchEngineResponseModel> Handle(CreateSearchEngineCommand command,CancellationToken cancellation=default)
         {
-            var requestModel = command.SearchEngine;
-
+            var requestModel = command.SearchEngine;          
             requestModel.Id = Guid.NewGuid().ToString();
 
             await _unitOfWork.SearchEngineRepository.AddAsync(requestModel);

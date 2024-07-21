@@ -11,10 +11,10 @@ namespace Domain
     {
         IQueryable<TEntity> Set { get; }
                
-        Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);
-        Task<List<TEntity?>> GetAllAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);
-        Task<List<TEntity?>> GetAllPaginatedAsync(Expression<Func<TEntity, bool>> expression, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
-        Task<TEntity?> GetAsNoTrackingAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);     
+        Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> expression, Expression<Func<TEntity, object>>[] includeExpressions = null, CancellationToken cancellationToken = default);
+        Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);
+        Task<List<TEntity>> GetAllPaginatedAsync(Expression<Func<TEntity, bool>> expression, int pageNumber, int pageSize, Expression<Func<TEntity, object>>[] includeExpressions = null, CancellationToken cancellationToken = default);
+        Task<TEntity> GetAsNoTrackingAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);     
         ValueTask AddAsync(TEntity entity, CancellationToken cancellationToken = default);  
         ValueTask UpdateAsync(TEntity entity, CancellationToken cancellationToken = default); 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

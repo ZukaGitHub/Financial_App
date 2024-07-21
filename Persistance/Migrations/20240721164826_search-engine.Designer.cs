@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Persistance;
@@ -11,9 +12,11 @@ using Persistance;
 namespace Persistance.Migrations
 {
     [DbContext(typeof(FinancialAppDBContext))]
-    partial class FinancialAppDBContextModelSnapshot : ModelSnapshot
+    [Migration("20240721164826_search-engine")]
+    partial class searchengine
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,6 +117,7 @@ namespace Persistance.Migrations
                         .HasColumnType("character varying");
 
                     b.Property<string>("MobileNumber")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying");
 
@@ -123,6 +127,7 @@ namespace Persistance.Migrations
                         .HasColumnType("character varying");
 
                     b.Property<string>("ProfilePhotoUrl")
+                        .IsRequired()
                         .HasColumnType("character varying");
 
                     b.HasKey("Id");
@@ -373,7 +378,7 @@ namespace Persistance.Migrations
                     b.HasOne("Domain.Entities.Client", "Client")
                         .WithOne("Address")
                         .HasForeignKey("Domain.Entities.Address", "ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Client");
@@ -434,7 +439,8 @@ namespace Persistance.Migrations
                 {
                     b.Navigation("Accounts");
 
-                    b.Navigation("Address");
+                    b.Navigation("Address")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

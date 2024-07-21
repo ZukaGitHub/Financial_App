@@ -6,6 +6,7 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,12 @@ namespace Application.Client.UpdateClient
         }
         public async Task<UpdateClientResponseModel> Handle(UpdateClientCommand command,CancellationToken cancellationToken)
         {
-            var client = await _unitOfWork.ClientRepository.GetAsync(c => c.Id == command.UpdatedClient.Id);
+            var includeExpressions = new Expression<Func<Domain.Entities.Client, object>>[]
+                                  {
+                                    client => client.Accounts,
+                                    client => client.Address
+                                  };
+            var client = await _unitOfWork.ClientRepository.GetAsync(c => c.Id == command.UpdatedClient.Id,includeExpressions);
             var response=new UpdateClientResponseModel();
 
             if (client == null)

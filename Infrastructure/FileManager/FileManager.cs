@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,23 +24,27 @@ namespace Infrastructure.FileManager
                 throw new ArgumentException("No file uploaded.");
             }
             var guid = Guid.NewGuid().ToString().Substring(0, 7);
+            var fileName=String.Concat(guid,file.FileName);
 
-            var filePath = Path.Combine(_uploadPath, file.FileName,guid);
+            var filePath = Path.Combine(_uploadPath, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
-            }
-           
-            var fileUrl = $"/uploads/{file.FileName}";
+            }        
 
-            return fileUrl;
+            return fileName;
         }
-        public Task DeleteFileAsync(string fileName)
+        public Task<bool>DeleteFileAsync(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
                 throw new ArgumentException("File name cannot be null or empty.");
+            }
+            fileName = fileName.TrimStart('/', '\\');
+            if (fileName.StartsWith("uploads", StringComparison.OrdinalIgnoreCase))
+            {
+                fileName = fileName.Substring("uploads".Length).TrimStart('/', '\\');
             }
 
             var filePath = Path.Combine(_uploadPath, fileName);
@@ -50,10 +55,10 @@ namespace Infrastructure.FileManager
             }
             else
             {
-                throw new FileNotFoundException("File not found.", fileName);
+                return Task.FromResult(false);
             }
 
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
     }
 }

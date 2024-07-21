@@ -22,21 +22,42 @@ namespace Persistance.Repositories
 
         public IQueryable<TEntity> Set => _set;
 
-        public Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default) =>
-            _set.FirstOrDefaultAsync(expression, cancellationToken);
+        public async Task<TEntity> GetAsync(
+        Expression<Func<TEntity, bool>> expression,
+         Expression<Func<TEntity, object>>[] includeExpressions = null,
+       CancellationToken cancellationToken = default)
+        {
+            IQueryable<TEntity> query = _set.Where(expression);
+         
+            if (includeExpressions != null)
+            {
+                foreach (var includeExpression in includeExpressions)
+                {
+                    query = query.Include(includeExpression);
+                }
+            }     
+            return await query.FirstOrDefaultAsync(cancellationToken);
+        }
 
-        public Task<List<TEntity?>> GetAllAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default) =>
+        public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default) =>
             _set.Where(expression).ToListAsync(cancellationToken);
         public async Task<List<TEntity>> GetAllPaginatedAsync(
          Expression<Func<TEntity, bool>> expression,
          int pageNumber,
          int pageSize,
+         Expression<Func<TEntity, object>>[] includeExpressions = null,
          CancellationToken cancellationToken = default)
         {
             try
             {
                 IQueryable<TEntity> query = _set.Where(expression);
-
+                if (includeExpressions != null)
+                {
+                    foreach (var includeExpression in includeExpressions)
+                    {
+                        query = query.Include(includeExpression);
+                    }
+                }
                 int totalCount = await query.CountAsync(cancellationToken);
 
                 int pageCount = totalCount > 0 ? (int)Math.Ceiling((double)totalCount / pageSize) : 0;
@@ -64,7 +85,7 @@ namespace Persistance.Repositories
         }
 
 
-        public Task<TEntity?> GetAsNoTrackingAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
+        public Task<TEntity> GetAsNoTrackingAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
             => _set.AsNoTracking().FirstOrDefaultAsync(expression, cancellationToken);
   
         public ValueTask AddAsync(TEntity entity, CancellationToken cancellationToken = default)

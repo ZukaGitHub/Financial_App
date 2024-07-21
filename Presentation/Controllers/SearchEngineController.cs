@@ -19,6 +19,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/SearchEngine")]
+    [Authorize(Policy = "RequireAdminClaim")]
     public class SearchEngineController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -51,8 +52,7 @@ namespace Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("Suggestions")]
-        //[Authorize]
+        [HttpGet("Suggestions")]    
         public async Task<IActionResult> GetSearchEngineSuggestions(CancellationToken cancellationToken = default)
         {
             try
@@ -88,8 +88,10 @@ namespace Presentation.Controllers
         {
             try
             {
+
                 var searchEngine = _mapper.Map<SearchEngine>(model);
                 var command = new CreateSearchEngineCommand() {SearchEngine=searchEngine};
+
                 searchEngine.UserId= HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 searchEngine.SearchDate = DateTime.Now;
 

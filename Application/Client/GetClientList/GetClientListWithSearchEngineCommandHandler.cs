@@ -3,6 +3,7 @@ using Domain.SharedModels;
 using Domain;
 using MediatR;
 using Domain.Entities;
+using System.Linq.Expressions;
 
 public class GetClientListWithSearchEngineCommandHandler : IRequestHandler<GetClientListWithSearchEngineCommand, GetClientListWithSearchEngineResponseModel>
 {
@@ -20,7 +21,7 @@ public class GetClientListWithSearchEngineCommandHandler : IRequestHandler<GetCl
         // Retrieve existing search engine entry if searchId is provided
         if (!string.IsNullOrEmpty(searchEngine.Id))
         {
-            var existingSearchEngine = await _unitOfWork.SearchEngineRepository.GetAsync(s=>s.Id==searchEngine.Id, cancellationToken);
+            var existingSearchEngine = await _unitOfWork.SearchEngineRepository.GetAsync(s=>s.Id==searchEngine.Id,null, cancellationToken);
 
             if (existingSearchEngine != null)
             {
@@ -69,6 +70,11 @@ public class GetClientListWithSearchEngineCommandHandler : IRequestHandler<GetCl
             await _unitOfWork.SearchEngineRepository.AddAsync(searchEngine);
             await _unitOfWork.SearchEngineRepository.SaveChangesAsync(cancellationToken);
         }
+        var includeExpressions = new Expression<Func<Client, object>>[]
+       {
+        client => client.Accounts,
+        client => client.Address
+       };
 
         var clientsList = await _unitOfWork.ClientRepository.GetAllPaginatedAsync(
             client =>
@@ -80,8 +86,10 @@ public class GetClientListWithSearchEngineCommandHandler : IRequestHandler<GetCl
                 (string.IsNullOrEmpty(searchEngine.PersonalId) || client.PersonalId == searchEngine.PersonalId),
             searchEngine.PageNumber.Value,
             searchEngine.PageSize.Value,
+            includeExpressions,
             cancellationToken
         );
+      
         if (searchEngine.SortOption != default)
         {
             clientsList = searchEngine.SortOption switch
@@ -103,7 +111,8 @@ public class GetClientListWithSearchEngineCommandHandler : IRequestHandler<GetCl
         {
             Clients = clientsList,
             PageNumber = searchEngine.PageNumber,
-            PageCount = pageCount
+            PageCount = pageCount,
+            SearchId=searchEngine.Id
         };
     }
 }

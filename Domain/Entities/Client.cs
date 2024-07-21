@@ -14,7 +14,7 @@ namespace Domain.Entities
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string PersonalId { get; set; }
+        public string PersonalId { get; set; }        
         public string ProfilePhotoUrl { get; set; }
         public string MobileNumber { get; set; }
         public GenderType Gender { get; set; }

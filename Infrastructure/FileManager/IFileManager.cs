@@ -10,6 +10,6 @@ namespace Infrastructure.FileManager
     public interface IFileManager
     {
         Task<string> SaveFileAsync(IFormFile file);
-        Task DeleteFileAsync(string fileName);
+        Task<bool> DeleteFileAsync(string fileName);
     }
 }
