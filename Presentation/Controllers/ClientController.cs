@@ -22,6 +22,8 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Presentation.Models.SearchEngine;
 using Application.SearchEngine;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Application.Client.GetClientList;
 
 namespace Presentation.Controllers
 {
@@ -61,35 +63,52 @@ namespace Presentation.Controllers
 
         }
         [HttpGet]
-        public async Task<IActionResult> GetClientList(SearchEngineDTO model,CancellationToken cancellationToken)
+        public async Task<IActionResult> GetClientListWithSearchEngine(SearchEngineDTO model,CancellationToken cancellationToken)
         {
             try
             {
                 var searchEngine = new SearchEngine();
+                searchEngine.UserId= HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+               
                 if (model == null || !SearchHelper.HasAnySearchCriteria(model))
                 {
-
-                    searchEngine.Id = new Guid().ToString();
+                   
                     searchEngine.PageNumber = 1;
                     searchEngine.PageSize = 9;
+                    searchEngine.SearchDate = DateTime.Now;
                 }
                 else
                 {
                     searchEngine = _mapper.Map<SearchEngine>(model);
-                    if (searchEngine.PageNumber == null)
+                    if (searchEngine.Id == null)
                     {
-                        searchEngine.PageNumber = 1;
+                        if (searchEngine.PageNumber == null)
+                        {
+                            searchEngine.PageNumber = 1;
+                        }
+                        if (searchEngine.PageSize == null)
+                        {
+                            searchEngine.PageNumber = 9;
+                        }
+                       
                     }
-                    if (searchEngine.PageSize == null)
-                    {
-                        searchEngine.PageNumber = 9;
-                    }
-
+                    searchEngine.SearchDate = DateTime.Now;
                 }
+                var command=new GetClientListWithSearchEngineCommand() {SearchEngine=searchEngine};
+                var result = await _mediator.Send(command, cancellationToken);
+                if(result.Clients!=null && result.Clients.Count > 0)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result.Errors);
+                }
+
             }
             catch(Exception ex)
             {
-
+                return BadRequest(ex.Message);
             }
         }
         [HttpPost("Create")]
@@ -238,12 +257,6 @@ namespace Presentation.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
-        [HttpGet("TEST")]
-        public async Task<IActionResult> Test()
-        {
-            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return Ok(userId);
-        }
+        }      
     }
 }

@@ -43,4 +43,10 @@ namespace Domain.SharedModels
     {
         public List<SearchEngine> SearchQueries { get; set; }
     }
+    public class GetClientListWithSearchEngineResponseModel : ResponseModel
+    {
+        public List<Client> Clients { get; set; }
+        public int? PageCount { get; set; }
+        public int? PageNumber { get; set; }
+    }
 }
