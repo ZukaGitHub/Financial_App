@@ -14,6 +14,10 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Infrastructure.ValidationService;
 using Infrastructure.FileManager;
 using Microsoft.AspNetCore.Http;
+using Application.Client.GetClient;
+using System.Threading;
+using Application.Client.DeleteClient;
+using Application.Client.UpdateClient;
 
 namespace Presentation.Controllers
 {
@@ -33,11 +37,25 @@ namespace Presentation.Controllers
             _FileManager = fileManager;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetClient()
-        //{
+        [HttpGet("Get")]
+        public async Task<IActionResult> GetClient(int Id,CancellationToken cancellationToken)
+        {
+            try
+            {
+                var command=new GetClientCommand() {  Id = Id };
+                var result = await _mediator.Send(command, cancellationToken);
+                if (result.Client != null)
+                {
+                    return Ok(result.Client);
+                }
+                return BadRequest(result.Errors);
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
 
-        //}
+        }
         //[HttpGet]
         //public async Task<IActionResult> GetClientList()
         //{
@@ -51,11 +69,7 @@ namespace Presentation.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
-                }
-                //if (Image == null)
-                //{
-                //    return BadRequest("Image Cannot Be null");
-                //}
+                }              
                 var AddressResult = await _validationService.IsValidCityAsync(model.CreateClientDTO.Address.City, model.CreateClientDTO.Address.Country);
                 if (!AddressResult)
                 {
@@ -73,6 +87,11 @@ namespace Presentation.Controllers
                 }
              
                 var client = _mapper.Map<Client>(model.CreateClientDTO);
+                var accounts = _mapper.Map<List<Account>>(model.AccountDTOForCreate);
+                client.Accounts= accounts;
+                var guid = Guid.NewGuid().ToString().Substring(0, 11);
+                client.PersonalId= guid;
+
                 var imageUrl = await _FileManager.SaveFileAsync(model.Image);
                 if (imageUrl != null)
                 {
@@ -94,15 +113,99 @@ namespace Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //[HttpPut]
-        //public async Task<IActionResult> UpdateClient()
-        //{
+        [HttpPut]
+        public async Task<IActionResult> UpdateClient([FromForm] UpdateClientWithImageAndRegionCode model,CancellationToken cancellationToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var client = new Client();
+                if (model.UpdateClientDTO != null)
+                {
+                    if (model.UpdateClientDTO.Address != null)
+                    {
 
-        //}
-        //[HttpDelete]
-        //public async Task<IActionResult> DeleteClient()
-        //{
+                        var AddressResult = await _validationService.IsValidCityAsync(model.UpdateClientDTO.Address.City, model.UpdateClientDTO.Address.Country);
+                        if (!AddressResult)
+                        {
+                            return BadRequest("invalid country or city,must input real country and city names");
+                        }
+                        var zipCodeResult = await _validationService.IsValidZipCodeAsync(model.UpdateClientDTO.Address.ZipCode, model.UpdateClientDTO.Address.City);
+                        if (!zipCodeResult)
+                        {
+                            return BadRequest("invalid zipcode for given city ,must input real zipcode and city");
+                        }
 
-        //}
+                    }
+                    if (model.UpdateClientDTO.MobileNumber != null && model.RegionCode != null)
+                    {
+                        var phoneNumberResult = _validationService.IsValidPhoneNumber(model.UpdateClientDTO.MobileNumber, model.RegionCode);
+                        if (!phoneNumberResult)
+                        {
+                            return BadRequest("invalid phone number format");
+                        }
+                    }
+                    if ((model.UpdateClientDTO.MobileNumber != null && model.RegionCode == null) || (model.UpdateClientDTO.MobileNumber == null && model.RegionCode != null))
+                    {
+                        return BadRequest("MobileNumber and RegionCode Have to be provided together,or not at all");
+                    }
+                    client = _mapper.Map<Client>(model.UpdateClientDTO);
+                }
+
+                if (model.Image != null)
+                {
+                    var imageUrl = await _FileManager.SaveFileAsync(model.Image);
+                    if (imageUrl != null)
+                    {
+                        client.ProfilePhotoUrl = imageUrl;
+                    }
+                }
+                if (!string.IsNullOrEmpty(model.PersonalId))
+                {
+                    client.PersonalId = model.PersonalId;
+                }
+                if(model.AccountsDTO != null && model.AccountsDTO.Count>0) 
+                {
+                    var accounts=_mapper.Map<List<Account>>(model.AccountsDTO);
+                    client.Accounts=accounts;              
+                }
+                var command = new UpdateClientCommand()
+                {
+                    UpdatedClient = client
+                };
+                var result = await _mediator.Send(command, cancellationToken);
+                if (result.IsUpdated)
+                {
+                    return Ok("Client Updated successfully");
+                }
+                return BadRequest(result.Errors);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> DeleteClient(int Id,CancellationToken cancellationToken)
+        {
+            try
+            {
+                var command = new DeleteClientCommand() { Id = Id };
+                var result = await _mediator.Send(command, cancellationToken);
+                if (result.IsDeleted)
+                {
+                    return Ok("Client Was Deleted");
+                }
+                return BadRequest(result.Errors);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

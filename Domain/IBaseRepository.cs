@@ -19,6 +19,7 @@ namespace Domain
         ValueTask UpdateAsync(TEntity entity, CancellationToken cancellationToken = default); 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         void Remove(TEntity entity);
+        void RemoveRange(List<TEntity> entities);
 
     }
 }

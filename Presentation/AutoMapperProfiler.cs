@@ -21,8 +21,14 @@ namespace Presentation.AutoMapper
             CreateMap<CreateClientDTO, Client>()
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
                 //.ForMember(dest => dest.Accounts, opt => opt.MapFrom(src => src.Accounts));
+            CreateMap<UpdateClientDTO,Client>()
+                .ForMember(dest=>dest.Address,opt=>opt.MapFrom(src => src.Address));
 
+            CreateMap<Address, AddressDTO>()
+             .ReverseMap();
 
+            CreateMap<Account, AccountDTO>()
+                .ReverseMap();
             CreateMap<Address, AddressDTOForCreate>()
                 .ReverseMap();
 

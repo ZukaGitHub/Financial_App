@@ -23,4 +23,16 @@ namespace Domain.SharedModels
     {
         public bool IsCreated { get; set; }
     }
+    public class GetClientReponseModel : ResponseModel
+    {
+        public Client Client { get; set; }
+    }
+    public class DeleteClientResponseModel : ResponseModel
+    {
+        public bool IsDeleted { get; set; }
+    }
+    public class UpdateClientResponseModel : ResponseModel
+    {
+        public bool IsUpdated { get; set; }
+    }
 }

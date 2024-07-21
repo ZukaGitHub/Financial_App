@@ -14,7 +14,7 @@ namespace Persistance.UnitOfWork
         private readonly FinancialAppDBContext _context;
 
         private IClientRepository _clientRepository;
-
+        private IAccountRepository _accountRepository;
         public UnitOfWork(FinancialAppDBContext context)
         {
             _context= context;
@@ -22,7 +22,7 @@ namespace Persistance.UnitOfWork
 
 
 
-
+        public IAccountRepository AccountRepository => _accountRepository ??= new AccountRepository(_context);
         public IClientRepository ClientRepository => _clientRepository ??= new ClientRepository(_context);
         public Task<int> SaveAsync() => _context.SaveChangesAsync();
     }

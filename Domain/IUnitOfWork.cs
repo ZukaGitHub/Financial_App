@@ -10,6 +10,7 @@ namespace Domain
     public interface IUnitOfWork
     {
         IClientRepository ClientRepository { get; }
+        IAccountRepository AccountRepository { get; }
         Task<int> SaveAsync();
     }
 }

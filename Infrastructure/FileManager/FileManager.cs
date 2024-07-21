@@ -22,8 +22,9 @@ namespace Infrastructure.FileManager
             {
                 throw new ArgumentException("No file uploaded.");
             }
+            var guid = Guid.NewGuid().ToString().Substring(0, 7);
 
-            var filePath = Path.Combine(_uploadPath, file.FileName);
+            var filePath = Path.Combine(_uploadPath, file.FileName,guid);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -33,6 +34,26 @@ namespace Infrastructure.FileManager
             var fileUrl = $"/uploads/{file.FileName}";
 
             return fileUrl;
+        }
+        public Task DeleteFileAsync(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new ArgumentException("File name cannot be null or empty.");
+            }
+
+            var filePath = Path.Combine(_uploadPath, fileName);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+            else
+            {
+                throw new FileNotFoundException("File not found.", fileName);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

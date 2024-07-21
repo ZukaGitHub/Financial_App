@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Client.GetClient
+namespace Application.Client.DeleteClient
 {
-    public class GetClientCommand:IRequest<GetClientReponseModel>
+    public class DeleteClientCommand:IRequest<DeleteClientResponseModel>
     {
         public int Id { get; set; }
     }

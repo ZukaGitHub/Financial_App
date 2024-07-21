@@ -87,5 +87,10 @@ namespace Persistance.Repositories
         {
             _set.Remove(entity);
         }
+
+        public void RemoveRange(List<TEntity> entities)
+        {
+            _set.RemoveRange(entities);
+        }
     }
 }
