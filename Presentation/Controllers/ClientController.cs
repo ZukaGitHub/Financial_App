@@ -18,6 +18,10 @@ using Application.Client.GetClient;
 using System.Threading;
 using Application.Client.DeleteClient;
 using Application.Client.UpdateClient;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Presentation.Models.SearchEngine;
+using Application.SearchEngine;
 
 namespace Presentation.Controllers
 {
@@ -56,11 +60,38 @@ namespace Presentation.Controllers
             }
 
         }
-        //[HttpGet]
-        //public async Task<IActionResult> GetClientList()
-        //{
+        [HttpGet]
+        public async Task<IActionResult> GetClientList(SearchEngineDTO model,CancellationToken cancellationToken)
+        {
+            try
+            {
+                var searchEngine = new SearchEngine();
+                if (model == null || !SearchHelper.HasAnySearchCriteria(model))
+                {
 
-        //}
+                    searchEngine.Id = new Guid().ToString();
+                    searchEngine.PageNumber = 1;
+                    searchEngine.PageSize = 9;
+                }
+                else
+                {
+                    searchEngine = _mapper.Map<SearchEngine>(model);
+                    if (searchEngine.PageNumber == null)
+                    {
+                        searchEngine.PageNumber = 1;
+                    }
+                    if (searchEngine.PageSize == null)
+                    {
+                        searchEngine.PageNumber = 9;
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+
+            }
+        }
         [HttpPost("Create")]
         public async Task<IActionResult> CreateClient([FromForm]CreateClientDTOWithRegionCode model, CancellationToken cancellationToken = default)
         {
@@ -116,6 +147,7 @@ namespace Presentation.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateClient([FromForm] UpdateClientWithImageAndRegionCode model,CancellationToken cancellationToken)
         {
+           
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -206,6 +238,12 @@ namespace Presentation.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        [HttpGet("TEST")]
+        public async Task<IActionResult> Test()
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Ok(userId);
         }
     }
 }

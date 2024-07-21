@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Presentation.Models;
 using Presentation.Models.Client;
+using Presentation.Models.SearchEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,9 @@ namespace Presentation.AutoMapper
 
             CreateMap<Address, AddressDTO>()
              .ReverseMap();
-
+            CreateMap<SearchEngine, SearchEngineDTO>().ReverseMap();
+            CreateMap<SearchEngine, CreateSearchEngineDTO>().ReverseMap();
+            CreateMap<SearchEngine, UpdateSearchEngineDTO>().ReverseMap();
             CreateMap<Account, AccountDTO>()
                 .ReverseMap();
             CreateMap<Address, AddressDTOForCreate>()

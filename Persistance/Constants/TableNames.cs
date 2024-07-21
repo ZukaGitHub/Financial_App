@@ -11,5 +11,6 @@ namespace Persistance.Constants
         public const string Clients = "Clients";
         public const string Addresses = "Addresses";
         public const string Accounts = "Accounts";
+        public const string SearchEngine = "SearchQueries";
     }
 }

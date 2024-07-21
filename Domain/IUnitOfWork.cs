@@ -11,6 +11,7 @@ namespace Domain
     {
         IClientRepository ClientRepository { get; }
         IAccountRepository AccountRepository { get; }
+        ISearchEngineRepository SearchEngineRepository { get; }
         Task<int> SaveAsync();
     }
 }

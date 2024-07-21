@@ -52,5 +52,6 @@ namespace Persistance
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Account> Accounts { get; set; }
+        public DbSet<SearchEngine> SearchQueries { get; set; }
     }
 }

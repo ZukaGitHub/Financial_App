@@ -31,6 +31,9 @@ namespace Infrastructure.JWT
                 List<Claim> claims = new List<Claim>()
             {
                 new Claim(JwtRegisteredClaimNames.GivenName,user.UserName),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                 new Claim(JwtRegisteredClaimNames.Name, "testClaim"),
+
             };
                
                 var userRoles = await _userManager.GetRolesAsync(user);

@@ -35,4 +35,12 @@ namespace Domain.SharedModels
     {
         public bool IsUpdated { get; set; }
     }
+    public class SearchEngineResponseModel : ResponseModel
+    {
+        public SearchEngine SearchEngine { get; set; }
+    }
+    public class SearchEngineListResponseModel :ResponseModel
+    {
+        public List<SearchEngine> SearchQueries { get; set; }
+    }
 }
