@@ -4,17 +4,47 @@ This is .Net 8 wep Api that uses JWT/Identity authentication/authorization
 Uses PostgreSQL as Database(might need to adjust Connection String,JWT Audience and Issuer in appsettings)
 It is built using Clean Architecture
 there are in total 11 endpoints
-Api/Auth/Login         excpects userName and password
-Api/Auth/Register      
+Api/Auth/Login   
+
+
+
+excpects userName and password
+Api/Auth/Register 
+
+
+
+
+
+
 /Api/Client/Get
+
+
 /Api/Client/GetListWithSearchEngine
-/Api/Client/Create     postman Body/form-data
+
+
+/Api/Client/Create  postman Body/form-data
+
+
+
 /Api/Client/Update     postman Body/form-data
+
+
+
+
 /Api/Client/Delete
 
 /api/SearchEngine/Get
+
+
+
 /api/SearchEngine/Suggestions
+
+
+
 /api/SearchEngine/Create
+
+
+
 /api/SearchEngine/Update
 
 
@@ -27,4 +57,4 @@ as helpers,then comes Persistance layer(for database Configurations and Interfac
 
 
 Used Libraries and Packages
-Mediatr,Automapper,EntityFrameworkCore,libPhoneNumbers
+Mediatr,     Automapper,      EntityFrameworkCore,      libPhoneNumbers
