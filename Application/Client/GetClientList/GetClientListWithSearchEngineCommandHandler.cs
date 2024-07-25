@@ -92,26 +92,26 @@ public class GetClientListWithSearchEngineCommandHandler : IRequestHandler<GetCl
       
         if (searchEngine.SortOption != default)
         {
-            clientsList = searchEngine.SortOption switch
+            clientsList.PagedItems = searchEngine.SortOption switch
             {
-                SearchOptionENUM.EmailAsc => clientsList.OrderBy(c => c.Email).ToList(),
-                SearchOptionENUM.EmailDesc => clientsList.OrderByDescending(c => c.Email).ToList(),
-                SearchOptionENUM.FirstNameAsc => clientsList.OrderBy(c => c.FirstName).ToList(),
-                SearchOptionENUM.FirstNameDesc => clientsList.OrderByDescending(c => c.FirstName).ToList(),
-                SearchOptionENUM.LastNameAsc => clientsList.OrderBy(c => c.LastName).ToList(),
-                SearchOptionENUM.LastNameDesc => clientsList.OrderByDescending(c => c.LastName).ToList(),
-                _ => clientsList
+                SearchOptionENUM.EmailAsc => clientsList.PagedItems.OrderBy(c => c.Email).ToList(),
+                SearchOptionENUM.EmailDesc => clientsList.PagedItems.OrderByDescending(c => c.Email).ToList(),
+                SearchOptionENUM.FirstNameAsc => clientsList.PagedItems.OrderBy(c => c.FirstName).ToList(),
+                SearchOptionENUM.FirstNameDesc => clientsList.PagedItems.OrderByDescending(c => c.FirstName).ToList(),
+                SearchOptionENUM.LastNameAsc => clientsList.PagedItems.OrderBy(c => c.LastName).ToList(),
+                SearchOptionENUM.LastNameDesc => clientsList.PagedItems.OrderByDescending(c => c.LastName).ToList(),
+                _ => clientsList.PagedItems
             };
         }
 
 
-        var pageCount = clientsList.Count() > 0 ? (int)Math.Ceiling((double)clientsList.Count() / searchEngine.PageSize.Value) : 0;
+      
 
         return new GetClientListWithSearchEngineResponseModel
         {
-            Clients = clientsList,
+            Clients = clientsList.PagedItems,
             PageNumber = searchEngine.PageNumber,
-            PageCount = pageCount,
+            PageCount = clientsList.PageCount,
             SearchId=searchEngine.Id
         };
     }

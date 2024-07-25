@@ -41,7 +41,7 @@ namespace Persistance.Repositories
 
         public Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default) =>
             _set.Where(expression).ToListAsync(cancellationToken);
-        public async Task<List<TEntity>> GetAllPaginatedAsync(
+        public async Task<(List<TEntity> PagedItems, int PageCount)> GetAllPaginatedAsync(
          Expression<Func<TEntity, bool>> expression,
          int pageNumber,
          int pageSize,
@@ -50,6 +50,7 @@ namespace Persistance.Repositories
         {
             try
             {
+                
                 IQueryable<TEntity> query = _set.Where(expression);
                 if (includeExpressions != null)
                 {
@@ -76,7 +77,7 @@ namespace Persistance.Repositories
                 List<TEntity> pagedItems = await query.Skip(skipAmount).Take(pageSize).ToListAsync(cancellationToken);
 
 
-                return pagedItems;
+                return(pagedItems,pageCount);
             }
             catch (Exception ex)
             {
